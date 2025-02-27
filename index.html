@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Livestock Health Advisor</title>
+    <style>
+        :root {
+            --primary-black: #121212;
+            --primary-gold: #d4af37;
+            --secondary-gold: #ffd700;
+            --light-gold: #fff8dc;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--primary-black);
+            color: var(--light-gold);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 2px solid var(--primary-gold);
+        }
+        
+        h1 {
+            color: var(--secondary-gold);
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        
+        .subtitle {
+            color: var(--primary-gold);
+            font-style: italic;
+            margin-top: 10px;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .panel {
+            flex: 1;
+            min-width: 300px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--primary-gold);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .panel-header {
+            color: var(--secondary-gold);
+            border-bottom: 1px solid var(--primary-gold);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        
+        select, input, button {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid var(--primary-gold);
+            border-radius: 4px;
+            background-color: var(--primary-black);
+            color: var(--light-gold);
+        }
+        
+        button {
+            background-color: var(--primary-gold);
+            color: var(--primary-black);
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: var(--secondary-gold);
+        }
+        
+        #results {
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            background-color: rgba(212, 175, 55, 0.1);
+            border: 1px solid var(--primary-gold);
+        }
+        
+        .result-title {
+            color: var(--secondary-gold);
+            margin-top: 0;
+        }
+        
+        .tag {
+            display: inline-block;
+            background-color: var(--primary-gold);
+            color: var(--primary-black);
+            padding: 3px 10px;
+            border-radius: 15px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .symptom-list {
+            margin-top: 10px;
+        }
+        
+        .symptom-item {
+            margin-bottom: 5px;
+        }
+        
+        .treatment-section {
+            margin-top: 20px;
+            border-top: 1px dashed var(--primary-gold);
+            padding-top: 15px;
+        }
+        
+        .prevention-section {
+            margin-top: 20px;
+            border-top: 1px dashed var(--primary-gold);
+            padding-top: 15px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            border-top: 1px solid var(--primary-gold);
+            color: var(--primary-gold);
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Livestock Health Advisor</h1>
+            <p class="subtitle">Expert remedies for goat and cattle ailments</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="panel">
+                <h2 class="panel-header">Diagnosis Assistant</h2>
+                <form id="diagnosis-form">
+                    <div>
+                        <label for="animal-type">Animal Type:</label>
+                        <select id="animal-type" name="animal-type">
+                            <option value="">Select Animal</option>
+                            <option value="goat">Goat</option>
+                            <option value="cattle">Cattle</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="symptoms">Symptoms (select multiple):</label>
+                        <select id="symptoms" name="symptoms" multiple size="5">
+                            <!-- Will be populated by JavaScript -->
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="age">Animal Age (years):</label>
+                        <input type="number" id="age" name="age" min="0" step="0.1">
+                    </div>
+                    
+                    <div>
+                        <label for="additional-notes">Additional Observations:</label>
+                        <textarea id="additional-notes" name="additional-notes" rows="3" style="width: 100%; background-color: var(--primary-black); color: var(--light-gold); border: 1px solid var(--primary-gold); border-radius: 4px; padding: 10px;"></textarea>
+                    </div>
+                    
+                    <button type="button" id="diagnose-btn">Get Diagnosis & Treatment</button>
+                </form>
+            </div>
+            
+            <div class="panel">
+                <h2 class="panel-header">Common Diseases Reference</h2>
+                <div>
+                    <label for="disease-filter">Filter by animal:</label>
+                    <select id="disease-filter">
+                        <option value="all">All</option>
+                        <option value="goat">Goat</option>
+                        <option value="cattle">Cattle</option>
+                    </select>
+                </div>
+                <div id="disease-list" style="margin-top: 15px;">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+        
+        <div id="results" style="display: none;">
+            <h2 class="result-title">Diagnosis Results</h2>
+            <div class="tags-container">
+                <span class="tag">Animal: <span id="result-animal"></span></span>
+                <span class="tag">Age: <span id="result-age"></span></span>
+            </div>
+            
+            <div id="diagnosis-container">
+                <h3>Possible Conditions:</h3>
+                <div id="conditions-list"></div>
+            </div>
+            
+            <div class="treatment-section">
+                <h3>Recommended Treatments:</h3>
+                <div id="treatments-list"></div>
+            </div>
+            
+            <div class="prevention-section">
+                <h3>Prevention Tips:</h3>
+                <div id="prevention-list"></div>
+            </div>
+            
+            <div style="margin-top: 20px; font-style: italic; color: var(--primary-gold);">
+                <p><strong>Important:</strong> This tool provides general guidance only. Always consult with a veterinarian for accurate diagnosis and treatment.</p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Livestock Health Advisor &copy; 2025 | A Digital Tool for Farmers</p>
+        </footer>
+    </div>
+
+    <script>
+        // Database of symptoms, diseases and treatments
+        const livestockData = {
+            goat: {
+                symptoms: [
+                    "Diarrhea", "Coughing", "Weight loss", "Fever", "Lethargy",
+                    "Poor appetite", "Bloating", "Limping", "Hair loss", "Skin lesions",
+                    "Nasal discharge", "Difficulty breathing", "Swollen joints", "Anemia (pale gums)",
+                    "Abnormal milk", "Abortion", "Head tilting", "Grinding teeth", "Excessive salivation"
+                ],
+                diseases: {
+                    "Coccidiosis": {
+                        symptoms: ["Diarrhea", "Weight loss", "Lethargy", "Poor appetite"],
+                        treatments: [
+                            "Administer anticoccidial medication such as Amprolium (Corid) as prescribed by a veterinarian",
+                            "Ensure clean water and feed to prevent reinfection",
+                            "Isolate affected animals to prevent spread",
+                            "Provide supportive care with electrolytes to prevent dehydration"
+                        ],
+                        prevention: [
+                            "Maintain clean and dry housing",
+                            "Avoid overcrowding",
+                            "Elevate feed and water containers to prevent fecal contamination",
+                            "Proper manure management and regular cleaning of pens",
+                            "Consider prophylactic treatment in high-risk environments"
+                        ]
+                    },
+                    "Pneumonia": {
+                        symptoms: ["Coughing", "Fever", "Difficulty breathing", "Nasal discharge", "Lethargy"],
+                        treatments: [
+                            "Administer appropriate antibiotics as prescribed by a veterinarian",
+                            "Provide anti-inflammatory medication to reduce fever and inflammation",
+                            "Ensure warm, dry, draft-free housing",
+                            "Supportive care including B vitamins and probiotics"
+                        ],
+                        prevention: [
+                            "Proper ventilation in housing while avoiding drafts",
+                            "Vaccination against respiratory pathogens",
+                            "Avoid sudden temperature changes",
+                            "Reduce stress factors",
+                            "Isolate new animals before introducing to the herd"
+                        ]
+                    },
+                    "Caprine Arthritis Encephalitis (CAE)": {
+                        symptoms: ["Swollen joints", "Limping", "Weight loss", "Difficulty breathing", "Head tilting"],
+                        treatments: [
+                            "No cure available - management of symptoms only",
+                            "Anti-inflammatory medications to manage pain and swelling",
+                            "Nutritional supplements to maintain body condition",
+                            "Regular hoof trimming and soft bedding to improve comfort"
+                        ],
+                        prevention: [
+                            "Test and cull positive animals",
+                            "Feed heat-treated colostrum and pasteurized milk to kids",
+                            "Separate kids from CAE-positive dams at birth",
+                            "Implement strict biosecurity measures",
+                            "Purchase only CAE-negative animals"
+                        ]
+                    },
+                    "Enterotoxemia": {
+                        symptoms: ["Sudden death", "Diarrhea", "Bloating", "Lethargy", "Grinding teeth"],
+                        treatments: [
+                            "Administer antitoxin immediately",
+                            "Antibiotics as prescribed by a veterinarian",
+                            "Reduce feed intake temporarily",
+                            "Provide supportive care with fluids and electrolytes"
+                        ],
+                        prevention: [
+                            "Vaccination with Clostridium perfringens type C & D toxoid",
+                            "Gradual feed changes to prevent digestive upset",
+                            "Limit access to rich feeds",
+                            "Regular deworming program",
+                            "Provide adequate roughage in diet"
+                        ]
+                    },
+                    "External Parasites (Lice, Mites)": {
+                        symptoms: ["Hair loss", "Skin lesions", "Excessive scratching", "Poor condition", "Restlessness"],
+                        treatments: [
+                            "Apply appropriate parasiticides as recommended by a veterinarian",
+                            "Repeat treatment after 14 days to break lifecycle",
+                            "Clean and disinfect housing and equipment",
+                            "Isolate affected animals during treatment"
+                        ],
+                        prevention: [
+                            "Regular inspection of herd for early detection",
+                            "Quarantine new animals before introducing to herd",
+                            "Avoid sharing equipment between farms",
+                            "Regular cleaning and disinfection of housing",
+                            "Maintain good nutrition to support immune system"
+                        ]
+                    }
+                }
+            },
+            cattle: {
+                symptoms: [
+                    "Diarrhea", "Coughing", "Weight loss", "Fever", "Lethargy",
+                    "Reduced milk production", "Bloating", "Lameness", "Hair loss", "Increased respiratory rate",
+                    "Nasal discharge", "Difficulty breathing", "Swollen joints", "Anemia (pale mucous membranes)",
+                    "Abnormal milk", "Abortion", "Decreased rumen activity", "Excessive salivation", "Loss of appetite"
+                ],
+                diseases: {
+                    "Bovine Respiratory Disease (BRD)": {
+                        symptoms: ["Coughing", "Fever", "Nasal discharge", "Increased respiratory rate", "Lethargy"],
+                        treatments: [
+                            "Administer appropriate antibiotics as prescribed by a veterinarian",
+                            "Anti-inflammatory medications to reduce fever and inflammation",
+                            "Provide adequate rest and reduced stress",
+                            "Ensure good ventilation and comfortable housing"
+                        ],
+                        prevention: [
+                            "Vaccination against common respiratory pathogens",
+                            "Proper ventilation in housing",
+                            "Gradual introduction to new environments",
+                            "Reduce stress during handling and transportation",
+                            "Isolate new or sick animals"
+                        ]
+                    },
+                    "Mastitis": {
+                        symptoms: ["Abnormal milk", "Swollen udder", "Pain in udder", "Reduced milk production", "Fever"],
+                        treatments: [
+                            "Intramammary antibiotic treatment as prescribed by a veterinarian",
+                            "Frequent stripping of affected quarters",
+                            "Anti-inflammatory medication to reduce pain and swelling",
+                            "Topical application of liniments or ointments",
+                            "Supportive therapy with fluids if systemic symptoms are present"
+                        ],
+                        prevention: [
+                            "Proper milking hygiene including pre- and post-dipping",
+                            "Regular maintenance of milking equipment",
+                            "Clean, dry bedding areas",
+                            "Culling of chronic mastitis cases",
+                            "Dry cow therapy as recommended by veterinarian"
+                        ]
+                    },
+                    "Bloat": {
+                        symptoms: ["Bloating", "Respiratory distress", "Excessive salivation", "Decreased rumen activity", "Discomfort"],
+                        treatments: [
+                            "For mild cases: walking the animal and elevating front quarters",
+                            "Administration of anti-foaming agents like poloxalene or vegetable oil",
+                            "In severe cases: emergency rumen trocarization by a veterinarian",
+                            "Restricting access to feed until condition resolves"
+                        ],
+                        prevention: [
+                            "Gradual introduction to legume pastures",
+                            "Feed dry hay before turning out to lush pasture",
+                            "Avoid grazing high-risk pastures when wet with dew",
+                            "Provide access to anti-bloat blocks or liquids",
+                            "Consider adding bloat-preventing surfactants to water or feed"
+                        ]
+                    },
+                    "Foot Rot": {
+                        symptoms: ["Lameness", "Swelling between claws", "Foul odor", "Fever", "Reduced appetite"],
+                        treatments: [
+                            "Clean affected area thoroughly",
+                            "Topical application of antibiotics or copper sulfate",
+                            "Systemic antibiotics for severe cases as prescribed by a veterinarian",
+                            "Bandaging in severe cases to protect the area",
+                            "Provide dry, clean environment during recovery"
+                        ],
+                        prevention: [
+                            "Regular foot trimming",
+                            "Foot baths with copper sulfate or zinc sulfate solutions",
+                            "Maintain dry walking areas and proper drainage",
+                            "Remove sharp objects from pens and pastures",
+                            "Cull chronically affected animals"
+                        ]
+                    },
+                    "Johne's Disease": {
+                        symptoms: ["Chronic diarrhea", "Weight loss despite normal appetite", "Decreased milk production", "Bottle jaw (swelling under jaw)", "Progressive weakness"],
+                        treatments: [
+                            "No effective treatment - management of symptoms only",
+                            "Supportive care to maintain condition",
+                            "Cull positive animals to prevent spread"
+                        ],
+                        prevention: [
+                            "Test and cull program",
+                            "Separate calves from dams immediately after birth",
+                            "Feed colostrum from test-negative cows only",
+                            "Raise replacements separately from adults",
+                            "Maintain clean calving areas",
+                            "Purchase animals only from Johne's-free herds"
+                        ]
+                    }
+                }
+            }
+        };
+
+        // Function to populate symptom dropdown based on animal selection
+        function populateSymptoms() {
+            const animalType = document.getElementById('animal-type').value;
+            const symptomsSelect = document.getElementById('symptoms');
+            
+            // Clear existing options
+            symptomsSelect.innerHTML = '';
+            
+            if (animalType) {
+                const symptoms = livestockData[animalType].symptoms;
+                symptoms.forEach(symptom => {
+                    const option = document.createElement('option');
+                    option.value = symptom;
+                    option.textContent = symptom;
+                    symptomsSelect.appendChild(option);
+                });
+            }
+        }
+        
+        // Function to filter diseases by animal type
+        function filterDiseases() {
+            const filter = document.getElementById('disease-filter').value;
+            const diseaseList = document.getElementById('disease-list');
+            
+            // Clear existing list
+            diseaseList.innerHTML = '';
+            
+            if (filter === 'all' || filter === 'goat') {
+                addDiseasesToList('goat', diseaseList);
+            }
+            
+            if (filter === 'all' || filter === 'cattle') {
+                addDiseasesToList('cattle', diseaseList);
+            }
+        }
+        
+        // Function to add diseases to the reference list
+        function addDiseasesToList(animalType, container) {
+            const diseases = livestockData[animalType].diseases;
+            
+            for (const [disease, info] of Object.entries(diseases)) {
+                const diseaseCard = document.createElement('div');
+                diseaseCard.style.border = '1px solid var(--primary-gold)';
+                diseaseCard.style.borderRadius = '5px';
+                diseaseCard.style.padding = '10px';
+                diseaseCard.style.marginBottom = '15px';
+                
+                const title = document.createElement('h3');
+                title.textContent = disease;
+                title.style.color = 'var(--secondary-gold)';
+                title.style.marginTop = '0';
+                
+                const animalTag = document.createElement('span');
+                animalTag.className = 'tag';
+                animalTag.textContent = animalType.charAt(0).toUpperCase() + animalType.slice(1);
+                
+                const symptomsHeader = document.createElement('p');
+                symptomsHeader.innerHTML = '<strong>Common Symptoms:</strong>';
+                
+                const symptomsList = document.createElement('ul');
+                info.symptoms.forEach(symptom => {
+                    const item = document.createElement('li');
+                    item.textContent = symptom;
+                    symptomsList.appendChild(item);
+                });
+                
+                diseaseCard.appendChild(title);
+                diseaseCard.appendChild(animalTag);
+                diseaseCard.appendChild(symptomsHeader);
+                diseaseCard.appendChild(symptomsList);
+                
+                container.appendChild(diseaseCard);
+            }
+        }
+        
+        // Function to diagnose based on symptoms
+        function diagnoseDisease() {
+            const animalType = document.getElementById('animal-type').value;
+            const selectedSymptoms = Array.from(document.getElementById('symptoms').selectedOptions).map(option => option.value);
+            const age = document.getElementById('age').value;
+            
+            if (!animalType || selectedSymptoms.length === 0 || !age) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            // Display basic info
+            document.getElementById('result-animal').textContent = animalType.charAt(0).toUpperCase() + animalType.slice(1);
+            document.getElementById('result-age').textContent = age + ' years';
+            
+            // Find matching diseases
+            const diseases = livestockData[animalType].diseases;
+            const matchingDiseases = {};
+            
+            for (const [disease, info] of Object.entries(diseases)) {
+                // Calculate match percentage based on symptoms
+                const matchingSymptoms = info.symptoms.filter(symptom => selectedSymptoms.includes(symptom));
+                const matchPercentage = (matchingSymptoms.length / info.symptoms.length) * 100;
+                
+                if (matchingSymptoms.length > 0) {
+                    matchingDiseases[disease] = {
+                        matchPercentage: matchPercentage.toFixed(0),
+                        matchingSymptoms,
+                        treatments: info.treatments,
+                        prevention: info.prevention
+                    };
+                }
+            }
+            
+            // Display results
+            const conditionsList = document.getElementById('conditions-list');
+            const treatmentsList = document.getElementById('treatments-list');
+            const preventionList = document.getElementById('prevention-list');
+            
+            conditionsList.innerHTML = '';
+            treatmentsList.innerHTML = '';
+            preventionList.innerHTML = '';
+            
+            // Sort diseases by match percentage
+            const sortedDiseases = Object.entries(matchingDiseases)
+                .sort((a, b) => parseFloat(b[1].matchPercentage) - parseFloat(a[1].matchPercentage));
+            
+            if (sortedDiseases.length === 0) {
+                conditionsList.innerHTML = '<p>No specific conditions identified based on the symptoms provided.</p>';
+                treatmentsList.innerHTML = '<p>Please consult with a veterinarian for a proper diagnosis.</p>';
+                preventionList.innerHTML = '<p>Maintain good hygiene and proper nutrition.</p>';
+            } else {
+                // Display top matches
+                sortedDiseases.forEach(([disease, info]) => {
+                    const diseaseItem = document.createElement('div');
+                    diseaseItem.style.marginBottom = '15px';
+                    
+                    const header = document.createElement('h4');
+                    header.style.margin = '0 0 5px 0';
+                    header.innerHTML = `${disease} <span style="color: var(--primary-gold);">(${info.matchPercentage}% match)</span>`;
+                    
+                    const matchingSymptomsList = document.createElement('p');
+                    matchingSymptomsList.innerHTML = `<strong>Matching symptoms:</strong> ${info.matchingSymptoms.join(', ')}`;
+                    
+                    diseaseItem.appendChild(header);
+                    diseaseItem.appendChild(matchingSymptomsList);
+                    conditionsList.appendChild(diseaseItem);
+                });
+                
+                // Display treatments for the top match
+                const topDisease = sortedDiseases[0][0];
+                const topInfo = sortedDiseases[0][1];
+                
+                const treatmentHeader = document.createElement('p');
+                treatmentHeader.innerHTML = `<strong>For ${topDisease} (${topInfo.matchPercentage}% match):</strong>`;
+                treatmentsList.appendChild(treatmentHeader);
+                
+                const treatmentUl = document.createElement('ul');
+                topInfo.treatments.forEach(treatment => {
+                    const item = document.createElement('li');
+                    item.textContent = treatment;
+                    treatmentUl.appendChild(item);
+                });
+                treatmentsList.appendChild(treatmentUl);
+                
+                // Display prevention tips
+                const preventionHeader = document.createElement('p');
+                preventionHeader.innerHTML = `<strong>Prevention tips for ${topDisease}:</strong>`;
+                preventionList.appendChild(preventionHeader);
+                
+                const preventionUl = document.createElement('ul');
+                topInfo.prevention.forEach(tip => {
+                    const item = document.createElement('li');
+                    item.textContent = tip;
+                    preventionUl.appendChild(item);
+                });
+                preventionList.appendChild(preventionUl);
+            }
+            
+            // Show results
+            document.getElementById('results').style.display = 'block';
+        }
+        
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('animal-type').addEventListener('change', populateSymptoms);
+            document.getElementById('disease-filter').addEventListener('change', filterDiseases);
+            document.getElementById('diagnose-btn').addEventListener('click', diagnoseDisease);
+            
+            // Initialize disease list
+            filterDiseases();
+        });
+    </script>
+</body>
+</html>
